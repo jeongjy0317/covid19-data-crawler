@@ -62,9 +62,9 @@ def get_foreign_data(target=''):
     logger.info("get_foreign_data: html parsed to beautifulsoup object")
 
     announced_time = ['2002',
-                      re.findall('([0-9]+)[.]', beautifulsoup_object.findAll('p', class_='s_descript')[1].text)[0],
-                      re.findall('[.]([0-9]+)', beautifulsoup_object.findAll('p', class_='s_descript')[1].text)[0],
-                      re.findall('([0-9]+)시', beautifulsoup_object.findAll('p', class_='s_descript')[1].text)[0]]
+                      re.findall('([0-9]+)[.]', beautifulsoup_object.findAll('p', class_='s_descript')[0].text)[0],
+                      re.findall('[.]([0-9]+)', beautifulsoup_object.findAll('p', class_='s_descript')[0].text)[0],
+                      re.findall('([0-9]+)시', beautifulsoup_object.findAll('p', class_='s_descript')[0].text)[0]]
     logger.info("get_foreign_data: get announced time | announced_time=" + str(announced_time))
 
     datetime_object = datetime.datetime.strptime(str(announced_time), "['%Y', '%m', '%d', '%H']")
