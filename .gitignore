@@ -6,3 +6,4 @@ src/status-data/
 src/patient-data/
 src/foreign-data/
 __pycache__/
+non-upload/
