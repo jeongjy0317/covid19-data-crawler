@@ -106,6 +106,7 @@ def get_foreign_data(target=''):
         '방글라데시': 'bangladesh',
         '브루나이': 'brunei',
         '몽골': 'mongolia',
+        '카자흐스탄': 'kazakhstan',
         '파키스탄': 'pakistan',
         '투르크메니스탄': 'turkmenistan',
         '이란': 'iran',
@@ -223,6 +224,8 @@ def get_foreign_data(target=''):
         '프랑스령레위니옹': 'regionreunion',
         '과들루프': 'guadeloupe',
         '케이맨제도': 'cayman',
+        '퀴라소': 'curacao',
+        '마요트': 'mayotte',
         '합계': 'synthesize'
     }
     logger.info("get_foreign_data: declare country_dictionary | country_dictionary=" + str(country_dictionary))
