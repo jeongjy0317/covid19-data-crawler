@@ -69,7 +69,7 @@ def get_foreign_data(target=''):
 
     datetime_object = datetime.datetime.strptime(str(announced_time), "['%Y', '%m', '%d', '%H']")
     logger.info("get_foreign_data: convert announced time to datetime object | datetime_object=" + str(datetime_object))
-    announced_time_unix = int(time.mktime(datetime_object.timetuple()))
+    announced_time_unix = int(time.mktime(datetime_object.timetuple())) - 32400
     logger.info("get_foreign_data: convert datetime object to unix time | announced_time_unix=" + str(announced_time_unix))
 
     raw_table = beautifulsoup_object.findAll('tbody')
