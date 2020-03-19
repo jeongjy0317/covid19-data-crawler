@@ -62,9 +62,9 @@ def get_status_data(target=''):
     beautifulsoup_object = BeautifulSoup(downloaded_html, "html.parser")
     logger.info("get_status_data: html parsed to beautifulsoup object")
 
-    announced_time = ['2002',
-                      re.findall('([0-9]+).', beautifulsoup_object.findAll('p', class_='info')[0].text)[0],
-                      re.findall('.([0-9]+)', beautifulsoup_object.findAll('p', class_='info')[0].text)[0],
+    announced_time = ['2020',
+                      re.findall('([0-9]+)[.]', beautifulsoup_object.findAll('p', class_='info')[0].text)[0],
+                      re.findall('[.]([0-9]+)', beautifulsoup_object.findAll('p', class_='info')[0].text)[0],
                       re.findall('([0-9]+)시', beautifulsoup_object.findAll('p', class_='info')[0].text)[0]]
     logger.info("get_status_data: get announced time | announced_time=" + str(announced_time))
 
