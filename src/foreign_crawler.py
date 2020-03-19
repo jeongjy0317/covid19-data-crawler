@@ -61,7 +61,7 @@ def get_foreign_data(target=''):
     beautifulsoup_object = BeautifulSoup(downloaded_html, "html.parser")
     logger.info("get_foreign_data: html parsed to beautifulsoup object")
 
-    announced_time = ['2002',
+    announced_time = ['2020',
                       re.findall('([0-9]+)[.]', beautifulsoup_object.findAll('p', class_='s_descript')[0].text)[0],
                       re.findall('[.]([0-9]+)', beautifulsoup_object.findAll('p', class_='s_descript')[0].text)[0],
                       re.findall('([0-9]+)시', beautifulsoup_object.findAll('p', class_='s_descript')[0].text)[0]]
