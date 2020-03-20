@@ -152,6 +152,8 @@ def get_foreign_data(target=''):
         '수리남': 'suriname',
         '과테말라': 'guatemala',
         '바하마': 'bahamas',
+        '엘살바도르': 'elsalvador',
+        '바베이도스': 'barbados',
         '이탈리아': 'italiana',
         '독일': 'germany',
         '프랑스': 'france',
@@ -200,6 +202,7 @@ def get_foreign_data(target=''):
         '터키': 'turkey',
         '몬테네그로': 'montenegro',
         '우즈베키스탄': 'uzbekistan',
+        '키즈기르스탄': 'kyrgyzstan',
         '호주': 'australia',
         '뉴질랜드': 'newzealand',
         '나이지리아': 'nigeria',
@@ -228,6 +231,9 @@ def get_foreign_data(target=''):
         '라이베리아': 'liberia',
         '탄자니아': 'tanzania',
         '지부티': 'djibouti',
+        '모리셔스': 'mauritius',
+        '감비아': 'gambia',
+        '잠비아': 'zambia',
         '일본크루즈': 'japan_cruise',
         '팔레스타인': 'palestine',
         '지브롤터': 'gibraltar',
@@ -249,6 +255,9 @@ def get_foreign_data(target=''):
         '괌': 'guam',
         '미국령버진아일랜드': 'unitedstatesvirginislands',
         '아루바': 'aruba',
+        '버뮤다': 'bermuda',
+        '신트마르틴': 'sintmartin',
+        '몬트세라트': 'montserrat',
         '합계': 'synthesize'
     }
     logger.info("get_foreign_data: declare country_dictionary | country_dictionary=" + str(country_dictionary))
