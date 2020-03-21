@@ -154,6 +154,7 @@ def get_foreign_data(target=''):
         '바하마': 'bahamas',
         '엘살바도르': 'elsalvador',
         '바베이도스': 'barbados',
+        '니카라구아': 'nicaragua',
         '이탈리아': 'italiana',
         '독일': 'germany',
         '프랑스': 'france',
@@ -205,6 +206,7 @@ def get_foreign_data(target=''):
         '키즈기르스탄': 'kyrgyzstan',
         '호주': 'australia',
         '뉴질랜드': 'newzealand',
+        '피지': 'fiji',
         '나이지리아': 'nigeria',
         '세네갈': 'senegal',
         '카메룬': 'cameroon',
@@ -234,6 +236,8 @@ def get_foreign_data(target=''):
         '모리셔스': 'mauritius',
         '감비아': 'gambia',
         '잠비아': 'zambia',
+        '차드': 'chad',
+        '니제르': 'niger',
         '일본크루즈': 'japan_cruise',
         '팔레스타인': 'palestine',
         '지브롤터': 'gibraltar',
@@ -258,6 +262,7 @@ def get_foreign_data(target=''):
         '버뮤다': 'bermuda',
         '신트마르틴': 'sintmartin',
         '몬트세라트': 'montserrat',
+        '뉴칼레도니아': 'newcaledonia',
         '합계': 'synthesize'
     }
     logger.info("get_foreign_data: declare country_dictionary | country_dictionary=" + str(country_dictionary))
