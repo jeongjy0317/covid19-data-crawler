@@ -9,6 +9,7 @@ import json
 import time
 
 import pymysql
+
 import mysql_patient_property
 
 logging.Formatter.converter = time.gmtime
@@ -17,7 +18,7 @@ fileHandler = RotatingFileHandler('./log/patient_crawler.log', maxBytes=1024 * 1
 fileHandler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] [%(filename)s:%(lineno)s] >> %(message)s'))
 logger.addHandler(fileHandler)
 logger.setLevel(logging.INFO)
-logger.info("every package loaded and start logging")
+logger.info('every package loaded and start logging')
 
 
 def insert_result(data_list):
@@ -41,20 +42,20 @@ def insert_result(data_list):
 
 
 def dump_result(uid, data):
-    with open("./patient-data/k_covid19_patient_" + str(uid) + ".json", "w") as json_file:
+    with open('./patient-data/k_covid19_patient_' + str(uid) + '.json', 'w') as json_file:
         json.dump(data, json_file)
 
 
 def get_busan_patient_path(target):
-    logger.info("get_busan_patient_info: function started | target=" + target)
+    logger.info('get_busan_patient_info: function started | target=' + target)
 
     downloaded_html = urlopen(target)
-    logger.info("get_busan_patient_info: html downloaded")
-    beautifulsoup_object = BeautifulSoup(downloaded_html, "html.parser")
-    logger.info("get_busan_patient_info: html parsed to beautifulsoup object")
+    logger.info('get_busan_patient_info: html downloaded')
+    beautifulsoup_object = BeautifulSoup(downloaded_html, 'html.parser')
+    logger.info('get_busan_patient_info: html parsed to beautifulsoup object')
 
     raw_patient_path_list_table = beautifulsoup_object.findAll('ul')
-    # li', class_="result
+    # li', class_='result
 
     patient_path_list = ['busan']
     day_in_month = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
@@ -62,10 +63,10 @@ def get_busan_patient_path(target):
     for raw_patient_path_table, patient_no in zip(
             reversed(raw_patient_path_list_table[2:len(raw_patient_path_list_table) - 4]),
             range(1, len(raw_patient_path_list_table) - 4)):
-        raw_patient_path_beautifulsoup_object = BeautifulSoup(str(raw_patient_path_table), "html.parser")
+        raw_patient_path_beautifulsoup_object = BeautifulSoup(str(raw_patient_path_table), 'html.parser')
         raw_patient_path_list = raw_patient_path_beautifulsoup_object.findAll('li', class_='result')[0]
 
-        raw_patient_path_list_beautifulsoup_object = BeautifulSoup(str(raw_patient_path_list), "html.parser")
+        raw_patient_path_list_beautifulsoup_object = BeautifulSoup(str(raw_patient_path_list), 'html.parser')
 
         for patient_path, path_no in zip(raw_patient_path_list_beautifulsoup_object.findAll('p'),
                                          range(len(raw_patient_path_list_beautifulsoup_object.findAll('p')))):
@@ -141,19 +142,19 @@ def get_busan_patient_path(target):
 
 
 def get_busan_patient_info(target):
-    logger.info("get_busan_patient_info: function started | target=" + target)
+    logger.info('get_busan_patient_info: function started | target=' + target)
 
     downloaded_html = urlopen(target)
-    logger.info("get_busan_patient_info: html downloaded")
-    beautifulsoup_object = BeautifulSoup(downloaded_html, "html.parser")
-    logger.info("get_busan_patient_info: html parsed to beautifulsoup object")
+    logger.info('get_busan_patient_info: html downloaded')
+    beautifulsoup_object = BeautifulSoup(downloaded_html, 'html.parser')
+    logger.info('get_busan_patient_info: html parsed to beautifulsoup object')
 
     raw_patient_info_list_table = beautifulsoup_object.findAll('ul')
 
     patient_info_list = ['busan']
 
     for raw_patient_info_table in reversed(raw_patient_info_list_table[2:len(raw_patient_info_list_table) - 4]):
-        raw_patient_info_beautifulsoup_object = BeautifulSoup(str(raw_patient_info_table), "html.parser")
+        raw_patient_info_beautifulsoup_object = BeautifulSoup(str(raw_patient_info_table), 'html.parser')
 
         patient_info_elements = raw_patient_info_beautifulsoup_object.findAll('li')
 
@@ -185,21 +186,21 @@ def get_busan_patient_info(target):
 
 
 def get_seoul_patient_path(target):
-    logger.info("get_seoul_patient_info: function started | target=" + target)
+    logger.info('get_seoul_patient_info: function started | target=' + target)
 
     downloaded_html = urlopen(target)
-    logger.info("get_seoul_patient_info: html downloaded")
-    beautifulsoup_object = BeautifulSoup(downloaded_html, "html.parser")
-    logger.info("get_seoul_patient_info: html parsed to beautifulsoup object")
+    logger.info('get_seoul_patient_info: html downloaded')
+    beautifulsoup_object = BeautifulSoup(downloaded_html, 'html.parser')
+    logger.info('get_seoul_patient_info: html parsed to beautifulsoup object')
 
-    raw_patient_path_list_table = beautifulsoup_object.findAll('td', class_="tdl")
+    raw_patient_path_list_table = beautifulsoup_object.findAll('td', class_='tdl')
 
     patient_path_list = ['seoul']
     day_in_month = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
     for raw_patient_path_table, patient_no in zip(reversed(raw_patient_path_list_table),
                                                   range(1, len(raw_patient_path_list_table) + 1)):
-        raw_patient_path_beautifulsoup_object = BeautifulSoup(str(raw_patient_path_table), "html.parser")
+        raw_patient_path_beautifulsoup_object = BeautifulSoup(str(raw_patient_path_table), 'html.parser')
 
         for patient_path, path_no in zip(raw_patient_path_beautifulsoup_object.findAll('li'),
                                          range(len(raw_patient_path_beautifulsoup_object.findAll('li')))):
@@ -273,19 +274,19 @@ def get_seoul_patient_path(target):
 
 
 def get_seoul_patient_info(target):
-    logger.info("get_seoul_patient_info: function started | target=" + target)
+    logger.info('get_seoul_patient_info: function started | target=' + target)
 
     downloaded_html = urlopen(target)
-    logger.info("get_seoul_patient_info: html downloaded")
-    beautifulsoup_object = BeautifulSoup(downloaded_html, "html.parser")
-    logger.info("get_seoul_patient_info: html parsed to beautifulsoup object")
+    logger.info('get_seoul_patient_info: html downloaded')
+    beautifulsoup_object = BeautifulSoup(downloaded_html, 'html.parser')
+    logger.info('get_seoul_patient_info: html parsed to beautifulsoup object')
 
-    raw_patient_info_list_table = beautifulsoup_object.findAll('tr', class_="patient")
+    raw_patient_info_list_table = beautifulsoup_object.findAll('tr', class_='patient')
 
     patient_info_list = ['seoul']
 
     for raw_patient_info_table in reversed(raw_patient_info_list_table):
-        raw_patient_info_beautifulsoup_object = BeautifulSoup(str(raw_patient_info_table), "html.parser")
+        raw_patient_info_beautifulsoup_object = BeautifulSoup(str(raw_patient_info_table), 'html.parser')
 
         patient_info_elements = raw_patient_info_beautifulsoup_object.findAll('td')
 
@@ -315,16 +316,16 @@ def get_seoul_patient_info(target):
 
 
 def get_patient_data():
-    logger.info("get_patient_data: function started")
+    logger.info('get_patient_data: function started')
 
     patient_list = []
 
-    patient_seoul = [get_seoul_patient_info("http://www.seoul.go.kr/coronaV/coronaStatus.do"),
-                     get_seoul_patient_path("http://www.seoul.go.kr/coronaV/coronaStatus.do")]
+    patient_seoul = [get_seoul_patient_info('http://www.seoul.go.kr/coronaV/coronaStatus.do'),
+                     get_seoul_patient_path('http://www.seoul.go.kr/coronaV/coronaStatus.do')]
     patient_list.append(patient_seoul)
 
-    patient_busan = [get_busan_patient_info("http://www.busan.go.kr/corona19/index"),
-                     get_busan_patient_path("http://www.busan.go.kr/corona19/index")]
+    patient_busan = [get_busan_patient_info('http://www.busan.go.kr/corona19/index'),
+                     get_busan_patient_path('http://www.busan.go.kr/corona19/index')]
     patient_list.append(patient_busan)
 
     return patient_list
@@ -332,12 +333,12 @@ def get_patient_data():
 
 if __name__ == '__main__':
     timestamp = int(time.time())
-    logger.info("recorded a time stamp | timestamp=" + str(timestamp))
+    logger.info('recorded a time stamp | timestamp=' + str(timestamp))
 
     result = get_patient_data()
 
     dump_result(timestamp, result)
-    logger.info("dump result | timestamp=" + str(timestamp) + " | result=" + str(result))
+    logger.info('dump result | timestamp=' + str(timestamp) + ' | result=' + str(result))
     insert_result(result)
-    logger.info("insert result | result=" + str(result))
+    logger.info('insert result | result=' + str(result))
 

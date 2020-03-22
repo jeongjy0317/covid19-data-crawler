@@ -10,6 +10,7 @@ import json
 import time
 
 import pymysql
+
 import mysql_foreign_property
 
 logging.Formatter.converter = time.gmtime
@@ -18,71 +19,71 @@ fileHandler = RotatingFileHandler('./log/foreign_crawler.log', maxBytes=1024 * 1
 fileHandler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] [%(filename)s:%(lineno)s] >> %(message)s'))
 logger.addHandler(fileHandler)
 logger.setLevel(logging.INFO)
-logger.info("every package loaded and start logging")
+logger.info('every package loaded and start logging')
 
 
 def insert_result(uid, data_list):
-    logger.info("insert_result: function started")
+    logger.info('insert_result: function started')
     connection = pymysql.connect(host=mysql_foreign_property.hostname, user=mysql_foreign_property.user,
                                  password=mysql_foreign_property.password, db=mysql_foreign_property.database,
                                  charset=mysql_foreign_property.charset)
-    logger.info("insert_result: database connection opened")
+    logger.info('insert_result: database connection opened')
     cursor = connection.cursor(pymysql.cursors.DictCursor)
-    logger.info("insert_result: database cursor created")
+    logger.info('insert_result: database cursor created')
 
     for data in data_list[1:]:
         cursor.execute(
             f"insert into foreign_{data['country']} values({uid}, {data_list[0]}, {data['certified']}, {data['dead']});")
-        logger.info("insert_result: foreign_" + str(data['country']) + " data inserted | uid=" + str(uid) + " | data_list[0]" + str(data_list[0]) + " | data=" + str(data))
+        logger.info('insert_result: foreign_' + str(data['country']) + ' data inserted | uid=' + str(uid) + ' | data_list[0]' + str(data_list[0]) + ' | data=' + str(data))
 
     connection.commit()
-    logger.info("insert_result: database connection commited")
+    logger.info('insert_result: database connection commited')
     connection.close()
-    logger.info("insert_result: database connection closed")
+    logger.info('insert_result: database connection closed')
 
-    logger.info("insert_result: function ended")
+    logger.info('insert_result: function ended')
 
 
 def dump_result(uid, data):
-    logger.info("dump_result: function started")
+    logger.info('dump_result: function started')
 
-    with open("./foreign-data/k_covid19_foreign_" + str(uid) + ".json", "w") as json_file:
+    with open('./foreign-data/k_covid19_foreign_' + str(uid) + '.json', 'w') as json_file:
         json.dump(data, json_file)
-    logger.info("dump_result: data dumped as " + "foreign-data/k_covid19_foreign_" + str(uid) + ".json | data=" + str(data))
+    logger.info('dump_result: data dumped as ' + 'foreign-data/k_covid19_foreign_' + str(uid) + '.json | data=' + str(data))
 
-    logger.info("dump_result: function ended")
+    logger.info('dump_result: function ended')
 
 
 def get_foreign_data(target=''):
-    logger.info("get_foreign_data: function started | target=" + target)
+    logger.info('get_foreign_data: function started | target=' + target)
 
     downloaded_html = urlopen(target)
-    logger.info("get_foreign_data: html downloaded")
-    beautifulsoup_object = BeautifulSoup(downloaded_html, "html.parser")
-    logger.info("get_foreign_data: html parsed to beautifulsoup object")
+    logger.info('get_foreign_data: html downloaded')
+    beautifulsoup_object = BeautifulSoup(downloaded_html, 'html.parser')
+    logger.info('get_foreign_data: html parsed to beautifulsoup object')
 
     announced_time = ['2020',
                       re.findall('([0-9]+)[.]', beautifulsoup_object.findAll('p', class_='s_descript')[0].text)[0],
                       re.findall('[.]([0-9]+)', beautifulsoup_object.findAll('p', class_='s_descript')[0].text)[0],
                       re.findall('([0-9]+)시', beautifulsoup_object.findAll('p', class_='s_descript')[0].text)[0]]
-    logger.info("get_foreign_data: get announced time | announced_time=" + str(announced_time))
+    logger.info('get_foreign_data: get announced time | announced_time=' + str(announced_time))
 
     datetime_object = datetime.datetime.strptime(str(announced_time), "['%Y', '%m', '%d', '%H']")
-    logger.info("get_foreign_data: convert announced time to datetime object | datetime_object=" + str(datetime_object))
+    logger.info('get_foreign_data: convert announced time to datetime object | datetime_object=' + str(datetime_object))
     announced_time_unix = int(time.mktime(datetime_object.timetuple())) - 32400
-    logger.info("get_foreign_data: convert datetime object to unix time | announced_time_unix=" + str(announced_time_unix))
+    logger.info('get_foreign_data: convert datetime object to unix time | announced_time_unix=' + str(announced_time_unix))
 
     raw_table = beautifulsoup_object.findAll('tbody')
-    logger.info("get_foreign_data: table picked out | raw_table=" + str(raw_table))
-    raw_table_beautifulsoup_object = BeautifulSoup(str(raw_table[0]), "html.parser")
-    logger.info("get_foreign_data: convert raw table to beautifulsoup object | raw_table_beautifulsoup_object=" + str(raw_table_beautifulsoup_object))
+    logger.info('get_foreign_data: table picked out | raw_table=' + str(raw_table))
+    raw_table_beautifulsoup_object = BeautifulSoup(str(raw_table[0]), 'html.parser')
+    logger.info('get_foreign_data: convert raw table to beautifulsoup object | raw_table_beautifulsoup_object=' + str(raw_table_beautifulsoup_object))
     table_data_rows = raw_table_beautifulsoup_object.findAll('tr')
-    logger.info("get_foreign_data: export table data from raw_table_beautifulsoup_object | table_data_rows=" + str(table_data_rows))
+    logger.info('get_foreign_data: export table data from raw_table_beautifulsoup_object | table_data_rows=' + str(table_data_rows))
     table_data_rows.reverse()
-    logger.info("get_foreign_data: reverse exported data | table_data_rows=" + str(table_data_rows))
+    logger.info('get_foreign_data: reverse exported data | table_data_rows=' + str(table_data_rows))
 
     foreign_data_list = [announced_time_unix]
-    logger.info("get_foreign_data: declare foreign_data_list | foreign_data_list=" + str(foreign_data_list))
+    logger.info('get_foreign_data: declare foreign_data_list | foreign_data_list=' + str(foreign_data_list))
     country_dictionary = {
         '중국': 'china',
         '홍콩': 'hongkong',
@@ -272,18 +273,18 @@ def get_foreign_data(target=''):
         '맨섬': 'isleofman',
         '합계': 'synthesize'
     }
-    logger.info("get_foreign_data: declare country_dictionary | country_dictionary=" + str(country_dictionary))
+    logger.info('get_foreign_data: declare country_dictionary | country_dictionary=' + str(country_dictionary))
 
-    table_data_beautifulsoup_object = BeautifulSoup(str(table_data_rows[0]), "html.parser")
-    logger.info("get_foreign_data: convert table_data to beautifulsoup object | table_data_beautifulsoup_object=" + str(table_data_beautifulsoup_object))
+    table_data_beautifulsoup_object = BeautifulSoup(str(table_data_rows[0]), 'html.parser')
+    logger.info('get_foreign_data: convert table_data to beautifulsoup object | table_data_beautifulsoup_object=' + str(table_data_beautifulsoup_object))
 
     country = table_data_beautifulsoup_object.findAll('th')[0].text
-    logger.info("get_foreign_data: extracting country from table data | country=" + str(country))
+    logger.info('get_foreign_data: extracting country from table data | country=' + str(country))
     certified = re.sub('[,명]', '',
                        re.sub('\(사망[  ][0-9,]+\)', '', table_data_beautifulsoup_object.findAll('td')[0].text))
-    logger.info("get_foreign_data: extracting certified from table data | certified=" + str(certified))
+    logger.info('get_foreign_data: extracting certified from table data | certified=' + str(certified))
     dead = re.findall('\(사망[  ]([0-9,]+)\)', table_data_beautifulsoup_object.findAll('td')[0].text)
-    logger.info("get_foreign_data: extracting dead from table data | country=" + str(dead))
+    logger.info('get_foreign_data: extracting dead from table data | country=' + str(dead))
 
     # print(country_dictionary[re.sub('[  ]', '', country)], re.sub('[  ]', '', country))
 
@@ -292,22 +293,22 @@ def get_foreign_data(target=''):
         'certified': int(certified),
         'dead': int(re.sub('[,명]', '', dead[0])) if dead != [] else 0
     }
-    logger.info("get_foreign_data: declare foreign data | foreign_data=" + str(foreign_data))
+    logger.info('get_foreign_data: declare foreign data | foreign_data=' + str(foreign_data))
 
     foreign_data_list.append(foreign_data)
-    logger.info("get_foreign_data: put foreign data into foreign data list | foreign_data_list=" + str(foreign_data_list))
+    logger.info('get_foreign_data: put foreign data into foreign data list | foreign_data_list=' + str(foreign_data_list))
 
     for table_data in table_data_rows[1:]:
-        table_data_beautifulsoup_object = BeautifulSoup(str(table_data), "html.parser")
-        logger.info("get_foreign_data: convert table_data to beautifulsoup object | table_data_beautifulsoup_object=" + str(table_data_beautifulsoup_object))
+        table_data_beautifulsoup_object = BeautifulSoup(str(table_data), 'html.parser')
+        logger.info('get_foreign_data: convert table_data to beautifulsoup object | table_data_beautifulsoup_object=' + str(table_data_beautifulsoup_object))
 
         country = table_data_beautifulsoup_object.findAll('td')[0].text
-        logger.info("get_foreign_data: extracting country from table data | country=" + str(country))
+        logger.info('get_foreign_data: extracting country from table data | country=' + str(country))
         certified = re.sub('[,명]', '',
                            re.sub('\(사망[  ][0-9,]+\)', '', table_data_beautifulsoup_object.findAll('td')[1].text))
-        logger.info("get_foreign_data: extracting certified from table data | certified=" + str(certified))
+        logger.info('get_foreign_data: extracting certified from table data | certified=' + str(certified))
         dead = re.findall('\(사망[  ]([0-9,]+)\)', table_data_beautifulsoup_object.findAll('td')[1].text)
-        logger.info("get_foreign_data: extracting dead from table data | country=" + str(dead))
+        logger.info('get_foreign_data: extracting dead from table data | country=' + str(dead))
 
         # print(country_dictionary[re.sub('[  ]', '', country)], re.sub('[  ]', '', country))
 
@@ -316,28 +317,27 @@ def get_foreign_data(target=''):
             'certified': int(certified),
             'dead': int(re.sub('[,명]', '', dead[0])) if dead != [] else 0
         }
-        logger.info("get_foreign_data: declare foreign data | foreign_data=" + str(foreign_data))
+        logger.info('get_foreign_data: declare foreign data | foreign_data=' + str(foreign_data))
 
         foreign_data_list.append(foreign_data)
-        logger.info("get_foreign_data: put foreign data into foreign data list | foreign_data_list=" + str(foreign_data_list))
+        logger.info('get_foreign_data: put foreign data into foreign data list | foreign_data_list=' + str(foreign_data_list))
 
-    logger.info("get_foreign_data: function ended | foreign_data_list=" + str(foreign_data_list))
+    logger.info('get_foreign_data: function ended | foreign_data_list=' + str(foreign_data_list))
     return foreign_data_list
 
 
 if __name__ == '__main__':
-    logger.info("start foreign_crawler.py")
+    logger.info('start foreign_crawler.py')
 
     timestamp = int(time.time())
-    logger.info("recorded a time stamp | timestamp=" + str(timestamp))
+    logger.info('recorded a time stamp | timestamp=' + str(timestamp))
 
-    result = get_foreign_data(target="http://ncov.mohw.go.kr/bdBoardList_Real.do?brdId=1&brdGubun=14")
-    logger.info("get result | result=" + str(result))
+    result = get_foreign_data(target='http://ncov.mohw.go.kr/bdBoardList_Real.do?brdId=1&brdGubun=14')
+    logger.info('get result | result=' + str(result))
 
     dump_result(timestamp, result)
-    logger.info("dump result | timestamp=" + str(timestamp) + " | result=" + str(result))
+    logger.info('dump result | timestamp=' + str(timestamp) + ' | result=' + str(result))
     insert_result(timestamp, result)
-    logger.info("insert result | timestamp=" + str(timestamp) + " | result=" + str(result))
+    logger.info('insert result | timestamp=' + str(timestamp) + ' | result=' + str(result))
 
-    logger.info("end foreign_crawler.py")
-
+    logger.info('end foreign_crawler.py')
