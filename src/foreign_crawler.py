@@ -149,6 +149,7 @@ def get_foreign_data(target=''):
         '튀니지': 'tunisia',
         '사우디아라비아': 'saudiarabia',
         '모로코': 'morocco',
+        '시리아': 'syria',
         '소말리아': 'somalia',
         '카보베르데': 'capeverde',
         '짐바브웨': 'zimbabwe',
@@ -156,6 +157,7 @@ def get_foreign_data(target=''):
         '앙골라': 'angola',
         '에리트레아': 'eritrea',
         '우간다': 'uganda',
+        '모잠비크': 'mozambique',
         '미국': 'usa',
         '캐나다': 'canada',
         '브라질': 'brasil',
@@ -187,6 +189,7 @@ def get_foreign_data(target=''):
         '바베이도스': 'barbados',
         '니카라구아': 'nicaragua',
         '아이티': 'haiti',
+        '그레나다': 'grenada',
         '이탈리아': 'italiana',
         '독일': 'germany',
         '프랑스': 'france',
@@ -234,6 +237,7 @@ def get_foreign_data(target=''):
         '사이프러스': 'cyprus',
         '터키': 'turkey',
         '몬테네그로': 'montenegro',
+        '코소보': 'kosovo',
         '우즈베키스탄': 'uzbekistan',
         '키르기스스탄': 'kyrgyzstan',
         '동티모르': 'easttimor',
@@ -315,6 +319,7 @@ def get_foreign_data(target=''):
     logger.info('get_foreign_data: extracting dead from table data | country=' + str(dead))
 
     # print(country_dictionary[re.sub('[  ]', '', country)], re.sub('[  ]', '', country))
+    #  print('\'foreign_' + country_dictionary[re.sub('[  ]', '', country)], end='\'')
 
     foreign_data = {
         'country': country_dictionary[re.sub('[  ]', '', country)],
@@ -339,6 +344,7 @@ def get_foreign_data(target=''):
         logger.info('get_foreign_data: extracting dead from table data | country=' + str(dead))
 
         # print(country_dictionary[re.sub('[  ]', '', country)], re.sub('[  ]', '', country))
+        #  print(', \'foreign_' + country_dictionary[re.sub('[  ]', '', country)], end='\'')
 
         foreign_data = {
             'country': country_dictionary[re.sub('[  ]', '', country)],
