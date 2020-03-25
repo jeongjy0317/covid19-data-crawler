@@ -7,3 +7,5 @@ src/patient-data/
 src/foreign-data/
 __pycache__/
 non-upload/
+mail_sender.py
+mail_property.py
