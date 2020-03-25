@@ -36,6 +36,7 @@ import time
 import pymysql
 
 import mysql_foreign_property
+import mail_sender
 
 logging.Formatter.converter = time.gmtime
 logger = logging.getLogger(__name__)
@@ -78,7 +79,7 @@ def dump_result(uid, data):
     logger.info('dump_result: function ended')
 
 
-def get_foreign_data(target=''):
+def get_foreign_data(target='', current_timestamp=0):
     logger.info('get_foreign_data: function started | target=' + target)
 
     downloaded_html = urlopen(target)
@@ -307,54 +308,181 @@ def get_foreign_data(target=''):
     }
     logger.info('get_foreign_data: declare country_dictionary | country_dictionary=' + str(country_dictionary))
 
-    table_data_beautifulsoup_object = BeautifulSoup(str(table_data_rows[0]), 'html.parser')
-    logger.info('get_foreign_data: convert table_data to beautifulsoup object | table_data_beautifulsoup_object=' + str(table_data_beautifulsoup_object))
+    table_convert_error = 0
+    table_data_error = 0
+    error_list = [0]
 
-    country = table_data_beautifulsoup_object.findAll('th')[0].text
-    logger.info('get_foreign_data: extracting country from table data | country=' + str(country))
-    certified = re.sub('[,명]', '',
-                       re.sub('\(사망[  ][0-9,]+\)', '', table_data_beautifulsoup_object.findAll('td')[0].text))
-    logger.info('get_foreign_data: extracting certified from table data | certified=' + str(certified))
-    dead = re.findall('\(사망[  ]([0-9,]+)\)', table_data_beautifulsoup_object.findAll('td')[0].text)
-    logger.info('get_foreign_data: extracting dead from table data | country=' + str(dead))
+    report_message = '- Dropper API Foreign Crawling Report -\n\n\n'
+    report_level = 0
 
-    # print(country_dictionary[re.sub('[  ]', '', country)], re.sub('[  ]', '', country))
-    #  print('\'foreign_' + country_dictionary[re.sub('[  ]', '', country)], end='\'')
+    try:
+        table_data = table_data_rows[0]
+        try:
+            table_data_beautifulsoup_object = BeautifulSoup(str(table_data), 'html.parser')
+            logger.info(
+                'get_foreign_data: convert table_data to beautifulsoup object | table_data_beautifulsoup_object=' + str(
+                    table_data_beautifulsoup_object))
+            try:
+                country = table_data_beautifulsoup_object.findAll('th')[0].text
+                logger.info('get_foreign_data: extracting country from table data | country=' + str(country))
+                try:
+                    certified = re.sub('[,명]', '',
+                                       re.sub('\(사망[  ][0-9,]+\)', '',
+                                              table_data_beautifulsoup_object.findAll('td')[0].text))
+                    logger.info('get_foreign_data: extracting certified from table data | certified=' + str(certified))
+                    dead = re.findall('\(사망[  ]([0-9,]+)\)', table_data_beautifulsoup_object.findAll('td')[0].text)
+                    logger.info('get_foreign_data: extracting dead from table data | country=' + str(dead))
 
-    foreign_data = {
-        'country': country_dictionary[re.sub('[  ]', '', country)],
-        'certified': int(certified),
-        'dead': int(re.sub('[,명]', '', dead[0])) if dead != [] else 0
-    }
-    logger.info('get_foreign_data: declare foreign data | foreign_data=' + str(foreign_data))
+                    # print(country_dictionary[re.sub('[  ]', '', country)], re.sub('[  ]', '', country))
+                    #  print('\'foreign_' + country_dictionary[re.sub('[  ]', '', country)], end='\'')
 
-    foreign_data_list.append(foreign_data)
-    logger.info('get_foreign_data: put foreign data into foreign data list | foreign_data_list=' + str(foreign_data_list))
+                    foreign_data = {
+                        'country': country_dictionary[re.sub('[  ]', '', country)],
+                        'certified': int(certified),
+                        'dead': int(re.sub('[,명]', '', dead[0])) if dead != [] else 0
+                    }
+                    logger.info('get_foreign_data: declare foreign data | foreign_data=' + str(foreign_data))
 
-    for table_data in table_data_rows[1:]:
-        table_data_beautifulsoup_object = BeautifulSoup(str(table_data), 'html.parser')
-        logger.info('get_foreign_data: convert table_data to beautifulsoup object | table_data_beautifulsoup_object=' + str(table_data_beautifulsoup_object))
+                    foreign_data_list.append(foreign_data)
+                    logger.info(
+                        'get_foreign_data: put foreign data into foreign data list | foreign_data_list=' + str(
+                            foreign_data_list))
+                except Exception as ex:
+                    if report_level < 1:
+                        report_level = 1
+                    error_list[0] = 1
+                    error_list.append([ex, table_data])
+                    logger.info('get_foreign_data: unregistered country name was found | ex=' + str(
+                        ex) + ' | error_list=' + str(error_list))
+            except Exception as ex:
+                if report_level < 2:
+                    report_level = 2
+                logger.info('get_foreign_data: cannot extract country from table data | ex=' + str(ex))
+                if table_data_error == 0:
+                    table_data_error = 1
+                    report_message += '* ERROR: cannot extract country from table data *\n\n\n'
+                    report_message += str(ex) + '\n'
+                    report_message += '\n'
+                    report_message += '\nThis report is about country index number 1'
+                    report_message += '\n'
+                    report_message += '\n\n\n\n\n'
+        except Exception as ex:
+            if report_level < 2:
+                report_level = 2
+            logger.info('get_foreign_data: cannot convert table_data to beautifulsoup object | ex=' + str(ex))
+            if table_convert_error == 0:
+                table_convert_error = 1
+                report_message += '* ERROR: cannot convert table_data to beautifulsoup object *\n\n\n'
+                report_message += str(ex) + '\n'
+                report_message += '\n'
+                report_message += '\nThis report is about table_data ' + str(table_data)
+                report_message += '\n'
+                report_message += '\n\n\n\n\n'
+        for table_data, index_no in zip(table_data_rows[1:], range(1, len(table_data_rows))):
+            try:
+                table_data_beautifulsoup_object = BeautifulSoup(str(table_data), 'html.parser')
+                logger.info(
+                    'get_foreign_data: convert table_data to beautifulsoup object | table_data_beautifulsoup_object=' + str(
+                        table_data_beautifulsoup_object))
+                try:
+                    country = table_data_beautifulsoup_object.findAll('td')[0].text
+                    logger.info('get_foreign_data: extracting country from table data | country=' + str(country))
+                    try:
+                        certified = re.sub('[,명]', '',
+                                           re.sub('\(사망[  ][0-9,]+\)', '',
+                                                  table_data_beautifulsoup_object.findAll('td')[1].text))
+                        logger.info(
+                            'get_foreign_data: extracting certified from table data | certified=' + str(certified))
+                        dead = re.findall('\(사망[  ]([0-9,]+)\)', table_data_beautifulsoup_object.findAll('td')[1].text)
+                        logger.info('get_foreign_data: extracting dead from table data | country=' + str(dead))
 
-        country = table_data_beautifulsoup_object.findAll('td')[0].text
-        logger.info('get_foreign_data: extracting country from table data | country=' + str(country))
-        certified = re.sub('[,명]', '',
-                           re.sub('\(사망[  ][0-9,]+\)', '', table_data_beautifulsoup_object.findAll('td')[1].text))
-        logger.info('get_foreign_data: extracting certified from table data | certified=' + str(certified))
-        dead = re.findall('\(사망[  ]([0-9,]+)\)', table_data_beautifulsoup_object.findAll('td')[1].text)
-        logger.info('get_foreign_data: extracting dead from table data | country=' + str(dead))
+                        # print(country_dictionary[re.sub('[  ]', '', country)], re.sub('[  ]', '', country))
+                        #  print('\'foreign_' + country_dictionary[re.sub('[  ]', '', country)], end='\'')
 
-        # print(country_dictionary[re.sub('[  ]', '', country)], re.sub('[  ]', '', country))
-        #  print(', \'foreign_' + country_dictionary[re.sub('[  ]', '', country)], end='\'')
+                        foreign_data = {
+                            'country': country_dictionary[re.sub('[  ]', '', country)],
+                            'certified': int(certified),
+                            'dead': int(re.sub('[,명]', '', dead[0])) if dead != [] else 0
+                        }
+                        logger.info('get_foreign_data: declare foreign data | foreign_data=' + str(foreign_data))
 
-        foreign_data = {
-            'country': country_dictionary[re.sub('[  ]', '', country)],
-            'certified': int(certified),
-            'dead': int(re.sub('[,명]', '', dead[0])) if dead != [] else 0
-        }
-        logger.info('get_foreign_data: declare foreign data | foreign_data=' + str(foreign_data))
+                        foreign_data_list.append(foreign_data)
+                        logger.info(
+                            'get_foreign_data: put foreign data into foreign data list | foreign_data_list=' + str(
+                                foreign_data_list))
+                    except Exception as ex:
+                        if report_level < 1:
+                            report_level = 1
+                        error_list[0] = 1
+                        error_list.append([ex, table_data])
+                        logger.info('get_foreign_data: unregistered country name was found | ex=' + str(
+                            ex) + ' | error_list=' + str(error_list))
+                except Exception as ex:
+                    if report_level < 2:
+                        report_level = 2
+                    logger.info('get_foreign_data: cannot extract country from table data | ex=' + str(ex))
+                    if table_data_error == 0:
+                        table_data_error = 1
+                        report_message += '* ERROR: cannot extract country from table data *\n\n\n'
+                        report_message += str(ex) + '\n'
+                        report_message += '\n'
+                        report_message += '\nThis report is about country index number ' + str(index_no)
+                        report_message += '\n'
+                        report_message += '\n\n\n\n\n'
+            except Exception as ex:
+                if report_level < 2:
+                    report_level = 2
+                logger.info('get_foreign_data: cannot convert table_data to beautifulsoup object | ex=' + str(ex))
+                if table_convert_error == 0:
+                    table_convert_error = 1
+                    report_message += '* ERROR: cannot convert table_data to beautifulsoup object *\n\n\n'
+                    report_message += str(ex) + '\n'
+                    report_message += '\n'
+                    report_message += '\nThis report is about table_data ' + str(table_data)
+                    report_message += '\n'
+                    report_message += '\n\n\n\n\n'
+    except Exception as ex:
+        if report_level < 3:
+            report_level = 3
+        logger.info('get_foreign_data: table_data_rows is empty | ex=' + str(ex))
+        report_message += '* FATAL: table_data_rows is empty *\n\n\n'
+        report_message += str(ex) + '\n'
+        report_message += '\n'
+        report_message += '\nThis report is about table_data_rows ' + str(table_data_rows)
+        report_message += '\n'
+        report_message += '\n\n\n\n\n'
 
-        foreign_data_list.append(foreign_data)
-        logger.info('get_foreign_data: put foreign data into foreign data list | foreign_data_list=' + str(foreign_data_list))
+    if error_list[0] == 1:
+        report_message += '* WARN: unregistered country name was found *\n\n\n'
+        for data in error_list[1:]:
+            report_message += '---------------------------\n'
+            report_message += f"{data[0]}\n\n{data[1]}\n"
+        report_message += '---------------------------\n'
+        report_message += '\n\n\n\n\n'
+
+    if report_level < 2:
+        report_message += 'Crawling finished successfully\n'
+        report_message += '\nThis report is based on (Unix Time)' + str(int(current_timestamp))
+        if report_level == 0:
+            mail_sender.send_mail(
+                subject=f'[Dropper API](foreign_crawler) INFO: consolidated report',
+                message=report_message)
+        elif report_level == 1:
+            mail_sender.send_mail(
+                subject=f'[Dropper API](foreign_crawler) WARN: consolidated report',
+                message=report_message)
+    elif report_level == 2:
+        report_message += 'Some error occurred while crawling\n'
+        report_message += '\nThis report is based on (Unix Time)' + str(int(current_timestamp))
+        mail_sender.send_mail(
+            subject=f'[Dropper API](foreign_crawler) ERROR: consolidated report',
+            message=report_message)
+    else:
+        report_message += 'Fatal error occurred while crawling\n'
+        report_message += '\nThis report is based on (Unix Time)' + str(int(current_timestamp))
+        mail_sender.send_mail(
+            subject=f'[Dropper API](foreign_crawler) FATAL: consolidated report',
+            message=report_message)
 
     logger.info('get_foreign_data: function ended | foreign_data_list=' + str(foreign_data_list))
     return foreign_data_list
@@ -366,7 +494,8 @@ if __name__ == '__main__':
     timestamp = int(time.time())
     logger.info('recorded a time stamp | timestamp=' + str(timestamp))
 
-    result = get_foreign_data(target='http://ncov.mohw.go.kr/bdBoardList_Real.do?brdId=1&brdGubun=14')
+    result = get_foreign_data(target='http://ncov.mohw.go.kr/bdBoardList_Real.do?brdId=1&brdGubun=14',
+                              current_timestamp=timestamp)
     logger.info('get result | result=' + str(result))
 
     dump_result(timestamp, result)
