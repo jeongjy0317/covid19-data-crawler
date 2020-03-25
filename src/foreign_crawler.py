@@ -337,8 +337,8 @@ def get_foreign_data(target='', current_timestamp=0):
                     dead = re.findall('\(사망[  ]([0-9,]+)\)', table_data_beautifulsoup_object.findAll('td')[0].text)
                     logger.info('get_foreign_data: extracting dead from table data | country=' + str(dead))
 
-                    # print(country_dictionary[re.sub('[  ]', '', country)], re.sub('[  ]', '', country))
-                    #  print('\'foreign_' + country_dictionary[re.sub('[  ]', '', country)], end='\'')
+                    # print('|' + country_dictionary[re.sub('[  ]', '', country)] + '|' + re.sub('[  ]', '', country) + '|')
+                    #  print('[\'foreign_' + country_dictionary[re.sub('[  ]', '', country)], end='\'')
 
                     foreign_data = {
                         'country': country_dictionary[re.sub('[  ]', '', country)],
@@ -400,8 +400,8 @@ def get_foreign_data(target='', current_timestamp=0):
                         dead = re.findall('\(사망[  ]([0-9,]+)\)', table_data_beautifulsoup_object.findAll('td')[1].text)
                         logger.info('get_foreign_data: extracting dead from table data | country=' + str(dead))
 
-                        # print(country_dictionary[re.sub('[  ]', '', country)], re.sub('[  ]', '', country))
-                        #  print('\'foreign_' + country_dictionary[re.sub('[  ]', '', country)], end='\'')
+                        # print('|' + country_dictionary[re.sub('[  ]', '', country)] + '|' + re.sub('[  ]', '', country) + '|')
+                        #  print(',\n\'foreign_' + country_dictionary[re.sub('[  ]', '', country)], end='\'')
 
                         foreign_data = {
                             'country': country_dictionary[re.sub('[  ]', '', country)],
@@ -455,6 +455,8 @@ def get_foreign_data(target='', current_timestamp=0):
         report_message += '\nThis report is about table_data_rows ' + str(table_data_rows)
         report_message += '\n'
         report_message += '\n\n\n\n\n'
+
+    #  print('],')
 
     if error_list[0] == 1:
         report_message += '* WARN: unregistered country name was found *\n\n\n'
